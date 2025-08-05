@@ -1,0 +1,25 @@
+# Production configuration
+server:
+  host: "0.0.0.0"
+  port: 8080
+  workers: 16
+
+database:
+  url: "${DATABASE_URL}"
+  max_connections: 50
+  min_connections: 5
+  acquire_timeout: 30
+  idle_timeout: 600
+
+auth:
+  jwt_secret: "${JWT_SECRET}"
+  jwt_expiration: 3600
+  bcrypt_cost: 14
+
+redis:
+  url: "${REDIS_URL}"
+  pool_size: 20
+
+monitoring:
+  prometheus_port: 9090
+  jaeger_endpoint: "${JAEGER_ENDPOINT}"

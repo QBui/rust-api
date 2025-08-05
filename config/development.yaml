@@ -1,0 +1,24 @@
+# Development configuration
+server:
+  host: "0.0.0.0"
+  port: 8080
+  workers: 4
+
+database:
+  url: "postgres://postgres:password@localhost:5432/scalable_api_dev"
+  max_connections: 10
+  min_connections: 2
+  acquire_timeout: 30
+  idle_timeout: 600
+
+auth:
+  jwt_secret: "dev-secret-key-change-in-production"
+  jwt_expiration: 3600
+  bcrypt_cost: 12
+
+redis:
+  url: "redis://localhost:6379"
+  pool_size: 10
+
+monitoring:
+  prometheus_port: 9090
