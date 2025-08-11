@@ -10,4 +10,4 @@ uuid = { workspace = true }
 time = { workspace = true }
 anyhow = { workspace = true }
 tracing = { workspace = true }
-async-trait = "0.1"
+async-trait.workspace = true

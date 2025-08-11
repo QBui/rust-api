@@ -21,12 +21,14 @@ path = "crates/api/src/main.rs"
 [workspace.dependencies]
 # Web framework
 axum = "0.7"
-tower = "0.4"
-tower-http = "0.5"
+tower = { version = "0.4" }
+tower-http = { version="0.5", features = ["compression-full", "cors"] }
+
 hyper = "1.0"
 
 # Async runtime
 tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1.88"
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
