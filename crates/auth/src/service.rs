@@ -110,10 +110,10 @@ impl AuthService {
     }
 
     #[instrument(skip(self))]
-    pub fn extract_token_from_header(&self, auth_header: &str) -> Result<&str> {
+    pub fn extract_token_from_header<'a>(&self, auth_header: &'a str) -> Result<&'a str> {
         auth_header
             .strip_prefix("Bearer ")
-            .ok_or_else(|| anyhow::anyhow!("Invalid authorization header format").into())
+            .ok_or_else(move || anyhow::anyhow!("Invalid authorization header format").into())
     }
 
     pub fn jwt_expiration(&self) -> u64 {

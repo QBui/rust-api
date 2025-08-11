@@ -5,7 +5,6 @@ use axum::{
 };
 use serde_json::json;
 use thiserror::Error;
-use std::convert::From;
 
 pub type Result<T> = std::result::Result<T, ApiError>;
 
@@ -58,7 +57,7 @@ impl IntoResponse for ApiError {
             ),
             ApiError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg, "BAD_REQUEST"),
             ApiError::Conflict(msg) => (StatusCode::CONFLICT, msg, "CONFLICT"),
-            ApiError::Config(msg) => (
+            ApiError::Config(_) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Configuration error".to_string(), 
                 "CONFIG_ERROR"
