@@ -1,10 +1,10 @@
 use auth::AuthService;
-use core::config::Config;
+use app_core::config::Config;
 use database::DatabasePool;
 use monitoring::{MetricsService, DatabaseAuditService, AuditService};
 use monitoring::feature_flags::{FeatureFlagService, InMemoryFeatureFlagService};
 use monitoring::CircuitBreaker;
-use core::enterprise::CircuitBreakerConfig;
+use app_core::enterprise::CircuitBreakerConfig;
 use std::sync::Arc;
 
 /// Shared application state containing all services and dependencies

@@ -9,10 +9,8 @@ use uuid::Uuid;
 
 use crate::state::AppState;
 use auth::Claims;
-use core::{
-    error::{ApiError, Result},
-    enterprise::{AuditLog, FeatureFlag, PerformanceMetrics},
-};
+use app_core::error::{ApiError, Result};
+use app_core::enterprise::{AuditLog, FeatureFlag, PerformanceMetrics};
 use monitoring::{audit_action, feature_enabled};
 
 /// Get audit trail for a specific user (admin only)

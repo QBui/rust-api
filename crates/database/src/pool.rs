@@ -2,8 +2,8 @@ use sqlx::{postgres::PgPoolOptions, PgPool, Row};
 use std::time::Duration;
 use tracing::{info, instrument};
 
-use core::{config::DatabaseConfig, error::Result};
-use crate::repositories::{UserRepository, UserRepositoryTrait};
+use app_core::{config::DatabaseConfig, error::Result};
+use crate::repositories::{UserRepository};
 
 #[derive(Clone)]
 pub struct DatabasePool {
@@ -24,7 +24,8 @@ impl DatabasePool {
             .await?;
 
         // Run migrations
-        sqlx::migrate!("./migrations").run(&pool).await?;
+        sqlx::migrate!("./migrations").run(&pool).await
+            .map_err(|e| anyhow::anyhow!("Migration failed: {}", e))?;
 
         info!("Database connection pool initialized successfully");
         Ok(Self { pool })

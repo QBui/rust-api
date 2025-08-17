@@ -6,7 +6,7 @@ use tracing::{error, instrument};
 use uuid::Uuid;
 
 use crate::models::Claims;
-use core::{config::AuthConfig, error::Result};
+use app_core::{config::AuthConfig, error::Result};
 
 #[derive(Clone)]
 pub struct AuthService {

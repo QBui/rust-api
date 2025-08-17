@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use uuid::Uuid;
+use ipnetwork::IpNetwork;
 
 /// Circuit breaker configuration for fault tolerance
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -28,7 +29,7 @@ pub struct AuditLog {
     pub action: String,
     pub resource_type: String,
     pub resource_id: Option<Uuid>,
-    pub ip_address: String,
+    pub ip_address: IpNetwork,
     pub user_agent: Option<String>,
     pub details: serde_json::Value,
     pub created_at: time::OffsetDateTime,

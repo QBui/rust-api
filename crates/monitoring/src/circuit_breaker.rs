@@ -4,10 +4,10 @@ use std::time::{Duration, Instant};
 use tokio::sync::RwLock;
 use tracing::{error, info, warn};
 
-use core::enterprise::CircuitBreakerConfig;
-use core::error::Result;
+use app_core::enterprise::CircuitBreakerConfig;
+use app_core::error::Result;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub enum CircuitState {
     Closed,    // Normal operation
     Open,      // Failing, reject all requests

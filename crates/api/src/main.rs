@@ -1,4 +1,35 @@
-pub async fn new() -> Result<Self> {
+use std::sync::Arc;
+use axum::{Router, routing::get, middleware as axum_middleware};
+use tower::ServiceBuilder;
+use tower_http::{trace::TraceLayer, compression::CompressionLayer, cors::CorsLayer};
+use anyhow;
+use tokio;
+
+use auth::AuthService;
+use app_core::config::Config;
+use app_core::error::{ApiError, Result};
+use database::DatabasePool;
+use monitoring::{MetricsService, DatabaseAuditService, AuditService, init_tracing};
+use monitoring::feature_flags::{FeatureFlagService, InMemoryFeatureFlagService};
+use monitoring::CircuitBreaker;
+use app_core::enterprise::CircuitBreakerConfig;
+
+mod handlers;
+mod routes;
+mod middleware;
+mod state;
+
+use state::AppState;
+
+/// Main application struct
+pub struct App {
+    state: Arc<AppState>,
+    config: Config,
+}
+
+impl App {
+    /// Create a new application instance
+    pub async fn new() -> Result<Self, anyhow::Error> {
         let config = Config::load()?;
 
         // Initialize database pool
@@ -36,6 +67,7 @@ pub async fn new() -> Result<Self> {
         Ok(Self { state, config })
     }
 
+    /// Create the application router
     fn create_router(&self) -> Router {
         Router::new()
             .nest("/api/v1", self.api_routes())
@@ -46,37 +78,65 @@ pub async fn new() -> Result<Self> {
                     .layer(TraceLayer::new_for_http())
                     .layer(CompressionLayer::new())
                     .layer(CorsLayer::permissive())
-                    .layer(middleware::from_fn(api_middleware::enterprise::timeout_middleware))
-                    .layer(middleware::from_fn(api_middleware::enterprise::security_headers_middleware))
-                    .layer(middleware::from_fn_with_state(
+                    .layer(axum_middleware::from_fn(middleware::enterprise::timeout_middleware))
+                    .layer(axum_middleware::from_fn(middleware::enterprise::security_headers_middleware))
+                    .layer(axum_middleware::from_fn_with_state(
                         self.state.clone(),
-                        api_middleware::enterprise::correlation_middleware,
+                        middleware::enterprise::correlation_middleware,
                     ))
-                    .layer(middleware::from_fn_with_state(
+                    .layer(axum_middleware::from_fn_with_state(
                         self.state.clone(),
-                        api_middleware::enterprise::performance_middleware,
+                        middleware::enterprise::performance_middleware,
                     ))
-                    .layer(middleware::from_fn_with_state(
+                    .layer(axum_middleware::from_fn_with_state(
                         self.state.clone(),
-                        api_middleware::rate_limit::rate_limit_middleware,
+                        middleware::rate_limit::rate_limit_middleware,
                     ))
-                    .layer(middleware::from_fn_with_state(
+                    .layer(axum_middleware::from_fn_with_state(
                         self.state.clone(),
-                        api_middleware::metrics::metrics_middleware,
+                        middleware::metrics::metrics_middleware,
                     ))
                     .into_inner(),
             )
             .with_state(self.state.clone())
     }
 
+    /// Create API routes
     fn api_routes(&self) -> Router<Arc<AppState>> {
         Router::new()
             .nest("/users", routes::users::router())
             .nest("/auth", routes::auth::router())
             .nest("/products", routes::products::router())
             .nest("/enterprise", routes::enterprise::router())
-            .layer(middleware::from_fn_with_state(
+            .layer(axum_middleware::from_fn_with_state(
                 self.state.clone(),
-                api_middleware::auth::auth_middleware,
+                middleware::auth::auth_middleware,
             ))
     }
+
+    /// Run the application
+    pub async fn run(self) -> Result<(), anyhow::Error> {
+        let router = self.create_router();
+        let listener = tokio::net::TcpListener::bind(format!("{}:{}", 
+            self.config.server.host, 
+            self.config.server.port
+        )).await?;
+
+        tracing::info!("Server running on {}:{}", self.config.server.host, self.config.server.port);
+        
+        axum::serve(listener, router).await?;
+        Ok(())
+    }
+}
+
+#[tokio::main]
+async fn main() -> Result<(), anyhow::Error> {
+    // Initialize tracing
+    init_tracing()?;
+
+    // Create and run the application
+    let app = App::new().await?;
+    app.run().await?;
+
+    Ok(())
+}

@@ -10,10 +10,8 @@ use uuid::Uuid;
 use validator::Validate;
 
 use crate::state::AppState;
-use core::{
-    error::{ApiError, Result},
-    models::{CreateUserRequest, UpdateUserRequest, UserResponse, PaginationParams, ListResponse},
-};
+use app_core::error::{ApiError, Result};
+use app_core::models::{CreateUserRequest, UpdateUserRequest, UserResponse, PaginationParams, ListResponse};
 use auth::Claims;
 use database::UserRepositoryTrait;
 

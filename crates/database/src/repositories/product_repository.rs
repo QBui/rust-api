@@ -3,8 +3,9 @@ use sqlx::PgPool;
 use time::OffsetDateTime;
 use tracing::instrument;
 use uuid::Uuid;
+use std::option::Option;
 
-use core::{
+use app_core::{
     error::Result,
     models::{Product, CreateProductRequest, PaginationParams, ListResponse, PaginationMetadata},
 };

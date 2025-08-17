@@ -9,7 +9,7 @@ path = "src/main.rs"
 
 [dependencies]
 # Workspace dependencies
-core = { path = "../core" }
+app_core = { path = "../core" }
 database = { path = "../database" }
 auth = { path = "../auth" }
 monitoring = { path = "../monitoring" }
@@ -17,7 +17,7 @@ monitoring = { path = "../monitoring" }
 # External dependencies
 axum = { workspace = true }
 tower = { workspace = true }
-tower-http = { workspace = true } #, features = ["cors", "trace", "compression-full"] }
+tower-http = { workspace = true }
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -28,3 +28,4 @@ validator = { workspace = true }
 governor = { workspace = true }
 metrics = { workspace = true }
 time = { workspace = true }
+rand = "0.8"

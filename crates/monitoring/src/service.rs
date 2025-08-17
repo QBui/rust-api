@@ -3,7 +3,7 @@ use metrics_exporter_prometheus::PrometheusBuilder;
 use std::collections::HashMap;
 use tracing::{error, info, instrument};
 
-use core::error::Result;
+use app_core::error::Result;
 
 #[derive(Clone)]
 pub struct MetricsService {
@@ -38,17 +38,17 @@ impl MetricsService {
             .map(|(k, v)| format!("{}={}", k, v))
             .collect();
 
-        counter!(name, labels.iter().cloned().collect::<Vec<_>>()).increment(1);
+        counter!(name, labels).increment(1);
     }
 
     #[instrument(skip(self))]
     pub fn increment_counter_by(&self, name: &str, value: u64, labels: &[(&str, &str)]) {
-        counter!(name, labels.iter().cloned().collect::<Vec<_>>()).increment(value);
+        counter!(name, labels).increment(value);
     }
 
     #[instrument(skip(self))]
     pub fn record_histogram(&self, name: &str, value: f64, labels: &[(&str, &str)]) {
-        histogram!(name, labels.iter().cloned().collect::<Vec<_>>()).record(value);
+        histogram!(name, labels).record(value);
     }
 
     #[instrument(skip(self))]

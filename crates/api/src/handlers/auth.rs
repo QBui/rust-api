@@ -8,7 +8,7 @@ use validator::Validate;
 
 use crate::state::AppState;
 use auth::{LoginRequest, LoginResponse, UserInfo};
-use core::error::{ApiError, Result};
+use app_core::error::{ApiError, Result};
 use database::UserRepositoryTrait;
 
 #[instrument(skip(state, request))]

@@ -5,7 +5,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{info, instrument};
 
-use core::{enterprise::FeatureFlag, error::Result};
+use app_core::{enterprise::FeatureFlag, error::Result};
 
 #[async_trait]
 pub trait FeatureFlagService: Send + Sync {

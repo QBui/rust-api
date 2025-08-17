@@ -4,7 +4,7 @@ use time::OffsetDateTime;
 use tracing::{instrument, warn};
 use uuid::Uuid;
 
-use core::{enterprise::AuditLog, error::Result};
+use app_core::{enterprise::AuditLog, error::Result};
 
 #[async_trait]
 pub trait AuditService: Send + Sync {

@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-core = { path = "../core" }
+app_core = { path = "../core" }
 jsonwebtoken = { workspace = true }
 argon2 = { workspace = true }
 uuid = { workspace = true }

@@ -5,7 +5,7 @@ use tracing_subscriber::{
     EnvFilter,
 };
 
-use core::error::Result;
+use app_core::error::Result;
 
 /// Initialize distributed tracing with structured logging
 pub fn init_tracing() -> Result<()> {

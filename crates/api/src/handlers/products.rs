@@ -11,10 +11,8 @@ use validator::Validate;
 
 use crate::state::AppState;
 use auth::Claims;
-use core::{
-    error::{ApiError, Result},
-    models::{Product, CreateProductRequest, PaginationParams, ListResponse},
-};
+use app_core::error::{ApiError, Result};
+use app_core::models::{Product, CreateProductRequest, PaginationParams, ListResponse};
 
 #[instrument(skip(state))]
 pub async fn list_products(

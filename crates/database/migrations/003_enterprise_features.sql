@@ -1,6 +1,6 @@
 -- Create audit logs table for enterprise audit trail
-CREATE TABLE IF NOT EXISTS audit_logs (
-    id UUID DEFAULT gen_random_uuid(),
+CREATE TABLE audit_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE SET NULL,
     action VARCHAR(100) NOT NULL,
     resource_type VARCHAR(50) NOT NULL,
@@ -8,12 +8,11 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     ip_address TEXT NOT NULL,
     user_agent TEXT,
     details JSONB NOT NULL DEFAULT '{}',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    PRIMARY KEY (id, created_at)
-) PARTITION BY RANGE (created_at);
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
 -- Create feature flags table for A/B testing and feature rollouts
-CREATE TABLE IF NOT EXISTS feature_flags (
+CREATE TABLE feature_flags (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL UNIQUE,
     enabled BOOLEAN NOT NULL DEFAULT false,
@@ -24,7 +23,7 @@ CREATE TABLE IF NOT EXISTS feature_flags (
 );
 
 -- Create performance metrics table for detailed analytics
-CREATE TABLE IF NOT EXISTS performance_metrics (
+CREATE TABLE performance_metrics (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     endpoint VARCHAR(255) NOT NULL,
     method VARCHAR(10) NOT NULL,
@@ -38,32 +37,32 @@ CREATE TABLE IF NOT EXISTS performance_metrics (
 );
 
 -- Create indexes for audit logs
-CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
-CREATE INDEX IF NOT EXISTS idx_audit_logs_resource ON audit_logs(resource_type, resource_id);
-CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action);
-CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at);
-CREATE INDEX IF NOT EXISTS idx_audit_logs_ip_address ON audit_logs(ip_address);
+CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX idx_audit_logs_resource ON audit_logs(resource_type, resource_id);
+CREATE INDEX idx_audit_logs_action ON audit_logs(action);
+CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
+CREATE INDEX idx_audit_logs_ip_address ON audit_logs(ip_address);
 
 -- Create indexes for feature flags
-CREATE INDEX IF NOT EXISTS idx_feature_flags_name ON feature_flags(name);
-CREATE INDEX IF NOT EXISTS idx_feature_flags_enabled ON feature_flags(enabled);
+CREATE INDEX idx_feature_flags_name ON feature_flags(name);
+CREATE INDEX idx_feature_flags_enabled ON feature_flags(enabled);
 
 -- Create indexes for performance metrics
-CREATE INDEX IF NOT EXISTS idx_performance_metrics_endpoint ON performance_metrics(endpoint);
-CREATE INDEX IF NOT EXISTS idx_performance_metrics_created_at ON performance_metrics(created_at);
-CREATE INDEX IF NOT EXISTS idx_performance_metrics_duration ON performance_metrics(duration_ms);
-CREATE INDEX IF NOT EXISTS idx_performance_metrics_user_id ON performance_metrics(user_id);
+CREATE INDEX idx_performance_metrics_endpoint ON performance_metrics(endpoint);
+CREATE INDEX idx_performance_metrics_created_at ON performance_metrics(created_at);
+CREATE INDEX idx_performance_metrics_duration ON performance_metrics(duration_ms);
+CREATE INDEX idx_performance_metrics_user_id ON performance_metrics(user_id);
 
 -- Add updated_at trigger for feature flags
-CREATE OR REPLACE TRIGGER update_feature_flags_updated_at BEFORE UPDATE ON feature_flags
+CREATE TRIGGER update_feature_flags_updated_at BEFORE UPDATE ON feature_flags
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Create partitioning for audit logs (monthly partitions for performance)
 -- This helps with large-scale audit log storage
-CREATE TABLE IF NOT EXISTS audit_logs_template (LIKE audit_logs INCLUDING ALL);
+CREATE TABLE audit_logs_template (LIKE audit_logs INCLUDING ALL);
 
 -- Create a function to automatically create partitions
-CREATE OR REPLACE FUNCTION create_monthly_partition(table_name text, start_date TIMESTAMPTZ)
+CREATE OR REPLACE FUNCTION create_monthly_partition(table_name text, start_date date)
 RETURNS void AS $$
 DECLARE
     partition_name text;
